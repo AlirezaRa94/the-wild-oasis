@@ -18,32 +18,32 @@ export async function createCabin(newCabin) {
     .replaceAll(" ", "-")
     .replaceAll("/", "");
 
+  // 1. Upload the image to the storage bucket
+  const { error: storageError } = await supabase.storage
+    .from("cabin-images")
+    .upload(imageName, newCabin.image);
+
+  if (storageError) {
+    console.error(storageError);
+    throw new Error(
+      "Cabin image could not be uploaded and the cabin was not created"
+    );
+  }
+
+  // 2. Create a new cabin record with the image path
   const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
 
-  // 1. Create a new cabin record with the image path
   const { data, error } = await supabase
     .from("cabins")
     .insert([{ ...newCabin, image: imagePath }])
     .select()
     .single();
 
+  // 3. If there was an error creating the cabin, delete the image from the storage bucket
   if (error) {
+    supabase.storage.from("cabin-images").remove([imageName]);
     console.error(error);
     throw new Error("Cabin could not be created");
-  }
-
-  // 2. Upload the image to the storage bucket
-  const { error: storageError } = await supabase.storage
-    .from("cabin-images")
-    .upload(imageName, newCabin.image);
-
-  // 3. Delete the cabin record if the image upload fails
-  if (storageError) {
-    await supabase.from("cabins").delete().eq("id", data.id);
-    console.error(storageError);
-    throw new Error(
-      "Cabin image could not be uploaded and the cabin was not created"
-    );
   }
 
   return data;
