@@ -11,28 +11,32 @@ export async function getCabins() {
   return data;
 }
 
-export async function createCabin(newCabin) {
-  const imageName = `${Math.random().toString(36).substring(6)}-${
-    newCabin.image.name
-  }`
+async function uploadCabinImage(image) {
+  const name = `${Math.random().toString(36).substring(6)}-${image.name}`
     .replaceAll(" ", "-")
     .replaceAll("/", "");
 
-  // 1. Upload the image to the storage bucket
   const { error: storageError } = await supabase.storage
     .from("cabin-images")
-    .upload(imageName, newCabin.image);
+    .upload(name, image);
 
   if (storageError) {
     console.error(storageError);
-    throw new Error(
-      "Cabin image could not be uploaded and the cabin was not created"
-    );
+    throw new Error("Cabin image could not be uploaded");
   }
 
-  // 2. Create a new cabin record with the image path
-  const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+  const path = `${supabaseUrl}/storage/v1/object/public/cabin-images/${name}`;
 
+  return { path, name };
+}
+
+export async function createCabin(newCabin) {
+  // 1. Upload the image to the storage bucket
+  const { path: imagePath, name: imageName } = await uploadCabinImage(
+    newCabin.image
+  );
+
+  // 2. Create a new cabin record with the image path
   const { data, error } = await supabase
     .from("cabins")
     .insert([{ ...newCabin, image: imagePath }])
@@ -44,6 +48,36 @@ export async function createCabin(newCabin) {
     supabase.storage.from("cabin-images").remove([imageName]);
     console.error(error);
     throw new Error("Cabin could not be created");
+  }
+
+  return data;
+}
+
+export async function updateCabin(newCabinData, id) {
+  const hasNewImage = typeof newCabinData.image !== "string";
+
+  // 1. If the cabin has a new image, upload it to the storage bucket
+  let imageData = {};
+  if (hasNewImage) {
+    imageData = await uploadCabinImage(newCabinData.image);
+    newCabinData.image = imageData.path;
+  }
+
+  // 2. Update the cabin record with the new data
+  const { data, error } = await supabase
+    .from("cabins")
+    .update(newCabinData)
+    .eq("id", id)
+    .select()
+    .single();
+
+  // 3. If there was an error updating the cabin, delete the new image from the storage bucket
+  if (error) {
+    if (hasNewImage) {
+      supabase.storage.from("cabin-images").remove([imageData.name]);
+    }
+    console.error(error);
+    throw new Error("Cabin could not be updated");
   }
 
   return data;

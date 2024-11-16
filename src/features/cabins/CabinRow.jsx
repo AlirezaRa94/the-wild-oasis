@@ -2,9 +2,12 @@ import propTypes from "prop-types";
 import styled from "styled-components";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
 import { formatCurrency } from "../../utils/helpers";
 import { deleteCabin } from "../../services/apiCabins";
+import CreateCabinForm from "./CreateCabinForm";
+import Row from "../../ui/Row";
 
 const TableRow = styled.div`
   display: grid;
@@ -57,6 +60,7 @@ CabinRow.propTypes = {
 };
 
 function CabinRow({ cabin }) {
+  const [showEditForm, setShowEditForm] = useState(false);
   const {
     id: cabinId,
     image,
@@ -77,16 +81,23 @@ function CabinRow({ cabin }) {
   });
 
   return (
-    <TableRow role='row'>
-      <Img src={image} alt='' />
-      <Cabin>{name}</Cabin>
-      <div>Fits up to {maxCapacity} guests</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{formatCurrency(discount)}</Discount>
-      <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
-        Delete
-      </button>
-    </TableRow>
+    <>
+      <TableRow role='row'>
+        <Img src={image} alt='' />
+        <Cabin>{name}</Cabin>
+        <div>Fits up to {maxCapacity} guests</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        <Discount>{formatCurrency(discount)}</Discount>
+        <Row>
+          <button onClick={() => setShowEditForm((show) => !show)}>Edit</button>
+          <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
+            Delete
+          </button>
+        </Row>
+      </TableRow>
+
+      {showEditForm && <CreateCabinForm cabinToEdit={cabin} />}
+    </>
   );
 }
 
