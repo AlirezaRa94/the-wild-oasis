@@ -25,6 +25,7 @@ function CreateCabinForm() {
     },
   });
   const { errors } = formState;
+  const isWorking = isCreating;
 
   function onSubmit(data) {
     mutate({ ...data, image: data.image[0] });
@@ -36,6 +37,7 @@ function CreateCabinForm() {
         <Input
           type='text'
           id='name'
+          disabled={isWorking}
           {...register("name", {
             required: "This field is required",
           })}
@@ -46,6 +48,7 @@ function CreateCabinForm() {
         <Input
           type='number'
           id='maxCapacity'
+          disabled={isWorking}
           {...register("maxCapacity", {
             required: "This field is required",
             min: {
@@ -60,6 +63,7 @@ function CreateCabinForm() {
         <Input
           type='number'
           id='regularPrice'
+          disabled={isWorking}
           {...register("regularPrice", {
             required: "This field is required",
             min: {
@@ -74,6 +78,7 @@ function CreateCabinForm() {
         <Input
           type='number'
           id='discount'
+          disabled={isWorking}
           defaultValue={0}
           {...register("discount", {
             required: "This field is required",
@@ -91,6 +96,7 @@ function CreateCabinForm() {
         <Textarea
           type='number'
           id='description'
+          disabled={isWorking}
           defaultValue=''
           {...register("description", {
             required: "This field is required",
