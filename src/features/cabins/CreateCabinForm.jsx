@@ -9,7 +9,8 @@ import Button from "../../ui/Button";
 import FormRow from "../../ui/FormRow";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import { createCabin, updateCabin } from "../../services/apiCabins";
+import { updateCabin } from "../../services/apiCabins";
+import { useCreateCabin } from "./useCreateCabin";
 
 CreateCabinForm.propTypes = {
   cabinToEdit: propTypes.shape({
@@ -31,18 +32,8 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     defaultValues: isEditSession ? editValues : {},
   });
   const queryClient = useQueryClient();
-  // Mutation function for creating a new cabin
-  const { mutate: mutateCreateCabin, isPending: isCreating } = useMutation({
-    mutationFn: createCabin,
-    onSuccess: () => {
-      toast.success("Cabin created successfully");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      reset();
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  const { createCabin, isCreating } = useCreateCabin();
+
   // Mutation function for editing an existing cabin
   const { mutate: mutateUpdateCabin, isPending: isEditing } = useMutation({
     mutationFn: ({ newCabinData, id }) => updateCabin(newCabinData, id),
@@ -64,7 +55,14 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     if (isEditSession) {
       mutateUpdateCabin({ newCabinData: { ...data, image }, id: editId });
     } else {
-      mutateCreateCabin({ ...data, image });
+      createCabin(
+        { ...data, image },
+        {
+          onSuccess: () => {
+            reset();
+          },
+        }
+      );
     }
   }
 
