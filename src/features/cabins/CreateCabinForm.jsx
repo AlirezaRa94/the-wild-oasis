@@ -139,6 +139,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           disabled={isWorking}
           {...register("image", {
             required: isEditSession ? false : "This field is required",
+            validate: (value) =>
+              typeof value === "string" ||
+              value.length === 1 ||
+              "Please upload an image",
           })}
         />
       </FormRow>
