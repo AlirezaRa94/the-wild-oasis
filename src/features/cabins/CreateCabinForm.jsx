@@ -30,10 +30,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     defaultValues: isEditSession ? editValues : {},
   });
   const { createCabin, isCreating } = useCreateCabin();
-  const { updateCabin, isEditing } = useUpdateCabin();
+  const { updateCabin, isUpdating } = useUpdateCabin();
 
   const { errors } = formState;
-  const isWorking = isCreating || isEditing;
+  const isWorking = isCreating || isUpdating;
 
   function onSubmit(data) {
     const image = typeof data.image === "string" ? data.image : data.image[0];
