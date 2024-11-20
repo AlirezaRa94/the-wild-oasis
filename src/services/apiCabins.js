@@ -12,6 +12,12 @@ export async function getCabins() {
 }
 
 async function uploadCabinImage(image) {
+  const hasNewImage = typeof image !== "string";
+
+  if (!hasNewImage) {
+    return { path: image, name: "" };
+  }
+
   const name = `${Math.random().toString(36).substring(6)}-${image.name}`
     .replaceAll(" ", "-")
     .replaceAll("/", "");
@@ -45,7 +51,9 @@ export async function createCabin(newCabin) {
 
   // 3. If there was an error creating the cabin, delete the image from the storage bucket
   if (error) {
-    supabase.storage.from("cabin-images").remove([imageName]);
+    if (imageName) {
+      supabase.storage.from("cabin-images").remove([imageName]);
+    }
     console.error(error);
     throw new Error("Cabin could not be created");
   }
@@ -54,14 +62,9 @@ export async function createCabin(newCabin) {
 }
 
 export async function updateCabin(newCabinData, id) {
-  const hasNewImage = typeof newCabinData.image !== "string";
-
-  // 1. If the cabin has a new image, upload it to the storage bucket
-  let imageData = {};
-  if (hasNewImage) {
-    imageData = await uploadCabinImage(newCabinData.image);
-    newCabinData.image = imageData.path;
-  }
+  // 1. Upload the new image to the storage bucket if it's a new image
+  const imageData = await uploadCabinImage(newCabinData.image);
+  newCabinData.image = imageData.path;
 
   // 2. Update the cabin record with the new data
   const { data, error } = await supabase
@@ -73,7 +76,7 @@ export async function updateCabin(newCabinData, id) {
 
   // 3. If there was an error updating the cabin, delete the new image from the storage bucket
   if (error) {
-    if (hasNewImage) {
+    if (imageData.name) {
       supabase.storage.from("cabin-images").remove([imageData.name]);
     }
     console.error(error);
