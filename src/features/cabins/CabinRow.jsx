@@ -14,6 +14,7 @@ const TableRow = styled.div`
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
   column-gap: 2.4rem;
   align-items: center;
+  text-align: center;
   padding: 1.4rem 2.4rem;
 
   &:not(:last-child) {
@@ -87,7 +88,11 @@ function CabinRow({ cabin }) {
         <Cabin>{name}</Cabin>
         <div>Fits up to {maxCapacity} guests</div>
         <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{formatCurrency(discount)}</Discount>
+        {discount ? (
+          <Discount>{formatCurrency(discount)}</Discount>
+        ) : (
+          <span>&mdash;</span>
+        )}
         <Row>
           <button onClick={() => setShowEditForm((show) => !show)}>Edit</button>
           <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
