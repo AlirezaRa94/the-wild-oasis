@@ -1,11 +1,13 @@
 import propTypes from "prop-types";
 import styled from "styled-components";
 import { useState } from "react";
+import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
 
 import { formatCurrency } from "../../utils/helpers";
 import CreateCabinForm from "./CreateCabinForm";
 import Row from "../../ui/Row";
 import { useDeleteCabin } from "./useDeleteCabin";
+import { useCreateCabin } from "./useCreateCabin";
 
 const TableRow = styled.div`
   display: grid;
@@ -55,12 +57,15 @@ CabinRow.propTypes = {
     maxCapacity: propTypes.number.isRequired,
     regularPrice: propTypes.number.isRequired,
     discount: propTypes.number.isRequired,
+    description: propTypes.string.isRequired,
   }).isRequired,
 };
 
 function CabinRow({ cabin }) {
   const [showEditForm, setShowEditForm] = useState(false);
   const { isDeleting, deleteCabin } = useDeleteCabin();
+  const { isCreating, createCabin } = useCreateCabin();
+  const isWorking = isCreating || isDeleting;
 
   const {
     id: cabinId,
@@ -69,7 +74,19 @@ function CabinRow({ cabin }) {
     maxCapacity,
     regularPrice,
     discount,
+    description,
   } = cabin;
+
+  function handleDuplicateCabin() {
+    createCabin({
+      name: `${name} (Copy)`,
+      maxCapacity,
+      regularPrice,
+      discount,
+      image,
+      description,
+    });
+  }
 
   return (
     <>
@@ -83,10 +100,18 @@ function CabinRow({ cabin }) {
         ) : (
           <span>&mdash;</span>
         )}
-        <Row>
-          <button onClick={() => setShowEditForm((show) => !show)}>Edit</button>
-          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
-            Delete
+        <Row type='horizontal'>
+          <button onClick={handleDuplicateCabin} disabled={isWorking}>
+            <HiSquare2Stack />
+          </button>
+          <button
+            onClick={() => setShowEditForm((show) => !show)}
+            disabled={isWorking}
+          >
+            <HiPencil />
+          </button>
+          <button onClick={() => deleteCabin(cabinId)} disabled={isWorking}>
+            <HiTrash />
           </button>
         </Row>
       </TableRow>
