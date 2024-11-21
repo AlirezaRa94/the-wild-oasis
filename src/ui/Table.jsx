@@ -106,10 +106,21 @@ function Row({ children }) {
 }
 
 Body.propTypes = {
-  children: propTypes.node.isRequired,
+  data: propTypes.array.isRequired,
+  render: propTypes.func.isRequired,
 };
 
-function Body({ children }) {}
+function Body({ data, render }) {
+  if (data.length === 0) {
+    return (
+      <Empty role='cell' colSpan='100%'>
+        No data available
+      </Empty>
+    );
+  }
+
+  return <StyledBody>{data.map(render)}</StyledBody>;
+}
 
 Table.Header = Header;
 Table.Row = Row;
