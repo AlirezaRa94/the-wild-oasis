@@ -1,6 +1,12 @@
+import { createContext, useContext, useState } from "react";
+import { createPortal } from "react-dom";
 import styled from "styled-components";
+import propTypes from "prop-types";
+import { HiEllipsisVertical } from "react-icons/hi2";
 
-const StyledMenu = styled.div`
+import { useOutsideClick } from "../hooks/useOutsideClick";
+
+const Menu = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -60,3 +66,100 @@ const StyledButton = styled.button`
     transition: all 0.3s;
   }
 `;
+
+const MenusContext = createContext();
+
+Menus.propTypes = {
+  children: propTypes.node.isRequired,
+};
+
+function Menus({ children }) {
+  const [openId, setOpenId] = useState(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const close = () => setOpenId(null);
+  const open = setOpenId;
+
+  return (
+    <MenusContext.Provider
+      value={{ openId, close, open, position, setPosition }}
+    >
+      {children}
+    </MenusContext.Provider>
+  );
+}
+
+Toggle.propTypes = {
+  id: propTypes.number.isRequired,
+};
+
+function Toggle({ id }) {
+  const { open, close, openId, setPosition } = useContext(MenusContext);
+
+  function handleClick(e) {
+    const rect = e.target.closest("button").getBoundingClientRect();
+
+    setPosition({
+      x: window.innerWidth - rect.right,
+      y: rect.y + rect.height + 8,
+    });
+
+    id === openId ? close() : open(id);
+  }
+
+  return (
+    <StyledToggle onClick={handleClick}>
+      <HiEllipsisVertical />
+    </StyledToggle>
+  );
+}
+
+List.propTypes = {
+  id: propTypes.number.isRequired,
+  children: propTypes.node.isRequired,
+};
+
+function List({ id, children }) {
+  const { openId, position, close } = useContext(MenusContext);
+  const ref = useOutsideClick(close);
+
+  if (id !== openId) return null;
+
+  return createPortal(
+    <StyledList position={position} ref={ref}>
+      {children}
+    </StyledList>,
+    document.body
+  );
+}
+
+Item.propTypes = {
+  children: propTypes.node.isRequired,
+  icon: propTypes.node.isRequired,
+  onClick: propTypes.func,
+  disabled: propTypes.bool,
+};
+
+function Item({ children, icon, onClick, disabled }) {
+  const { close } = useContext(MenusContext);
+
+  function handleClick() {
+    close();
+    onClick?.();
+  }
+
+  return (
+    <li>
+      <StyledButton onClick={handleClick} disabled={disabled}>
+        {icon} <span>{children}</span>
+      </StyledButton>
+    </li>
+  );
+}
+
+Menus.Menu = Menu;
+Menus.Toggle = Toggle;
+Menus.List = List;
+Menus.Item = Item;
+
+export default Menus;
