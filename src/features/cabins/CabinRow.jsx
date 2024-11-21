@@ -8,6 +8,7 @@ import Row from "../../ui/Row";
 import { useDeleteCabin } from "./useDeleteCabin";
 import { useCreateCabin } from "./useCreateCabin";
 import Modal from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete";
 
 const TableRow = styled.div`
   display: grid;
@@ -64,7 +65,6 @@ CabinRow.propTypes = {
 function CabinRow({ cabin }) {
   const { isDeleting, deleteCabin } = useDeleteCabin();
   const { isCreating, createCabin } = useCreateCabin();
-  const isWorking = isCreating || isDeleting;
 
   const {
     id: cabinId,
@@ -99,24 +99,34 @@ function CabinRow({ cabin }) {
         <span>&mdash;</span>
       )}
       <Row type='horizontal'>
-        <button onClick={handleDuplicateCabin} disabled={isWorking}>
+        <button onClick={handleDuplicateCabin} disabled={isCreating}>
           <HiSquare2Stack />
         </button>
 
         <Modal>
           <Modal.Open opens='edit-cabin'>
-            <button disabled={isWorking}>
+            <button disabled={isCreating}>
               <HiPencil />
             </button>
           </Modal.Open>
           <Modal.Content name='edit-cabin'>
             <CreateCabinForm cabinToEdit={cabin} />
           </Modal.Content>
-        </Modal>
 
-        <button onClick={() => deleteCabin(cabinId)} disabled={isWorking}>
-          <HiTrash />
-        </button>
+          <Modal.Open opens='delete-cabin'>
+            <button disabled={isDeleting}>
+              <HiTrash />
+            </button>
+          </Modal.Open>
+
+          <Modal.Content name='delete-cabin'>
+            <ConfirmDelete
+              resourceName={`Cabin ${name}`}
+              onConfirm={() => deleteCabin(cabinId)}
+              disabled={isDeleting}
+            />
+          </Modal.Content>
+        </Modal>
       </Row>
     </TableRow>
   );
