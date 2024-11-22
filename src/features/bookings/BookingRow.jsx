@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { format, isToday } from "date-fns";
+import propTypes from "prop-types";
 
 import Tag from "../../ui/Tag";
 import Table from "../../ui/Table";
@@ -33,6 +34,26 @@ const Amount = styled.div`
   font-family: "Sono";
   font-weight: 500;
 `;
+
+BookingRow.propTypes = {
+  booking: propTypes.shape({
+    id: propTypes.number,
+    created_at: propTypes.string,
+    startDate: propTypes.string,
+    endDate: propTypes.string,
+    numNights: propTypes.number,
+    numGuests: propTypes.number,
+    totalPrice: propTypes.number,
+    status: propTypes.string,
+    guests: propTypes.shape({
+      fullName: propTypes.string,
+      email: propTypes.string,
+    }),
+    cabins: propTypes.shape({
+      name: propTypes.string,
+    }),
+  }),
+};
 
 function BookingRow({
   booking: {
