@@ -7,7 +7,7 @@ import Pagination from "../../ui/Pagination";
 import { useGetBookings } from "./useGetBookings";
 
 function BookingTable() {
-  const { bookings, isPending } = useGetBookings();
+  const { bookings, isPending, count } = useGetBookings();
 
   if (isPending) return <Spinner />;
 
@@ -31,7 +31,7 @@ function BookingTable() {
         />
 
         <Table.Footer>
-          <Pagination count={bookings.length} />
+          <Pagination count={count} />
         </Table.Footer>
       </Table>
     </Menus>
