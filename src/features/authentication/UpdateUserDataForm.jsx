@@ -26,26 +26,26 @@ function UpdateUserDataForm() {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <FormRow label="Email address">
+      <FormRow label='Email address'>
         <Input value={email} disabled />
       </FormRow>
-      <FormRow label="Full name">
+      <FormRow label='Full name'>
         <Input
-          type="text"
+          type='text'
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          id="fullName"
+          id='fullName'
         />
       </FormRow>
-      <FormRow label="Avatar image">
+      <FormRow label='Avatar image'>
         <FileInput
-          id="avatar"
-          accept="image/*"
+          id='avatar'
+          accept='image/*'
           onChange={(e) => setAvatar(e.target.files[0])}
         />
       </FormRow>
       <FormRow>
-        <Button type="reset" variation="secondary">
+        <Button type='reset' $variation='secondary'>
           Cancel
         </Button>
         <Button>Update account</Button>
