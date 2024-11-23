@@ -9,7 +9,6 @@ export function useDeleteCabin() {
   const { isPending: isDeleting, mutate: deleteCabin } = useMutation({
     mutationFn: deleteCabinAPI,
     onSuccess: () => {
-      toast.success(`Cabin ${name} deleted successfully`);
       queryClient.invalidateQueries({ queryKey: ["cabins"] });
     },
     onError: (err) => toast.error(err.message),

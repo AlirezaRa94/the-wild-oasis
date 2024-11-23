@@ -1,6 +1,7 @@
 import propTypes from "prop-types";
 import styled from "styled-components";
 import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
+import toast from "react-hot-toast";
 
 import { formatCurrency } from "../../utils/helpers";
 import CreateCabinForm from "./CreateCabinForm";
@@ -121,7 +122,12 @@ function CabinRow({ cabin }) {
         <Modal.Content name='delete-cabin'>
           <ConfirmDelete
             resourceName={`Cabin ${name}`}
-            onConfirm={() => deleteCabin(cabinId)}
+            onConfirm={() =>
+              deleteCabin(cabinId, {
+                onSettled: () =>
+                  toast.success(`Cabin ${name} has been deleted successfully!`),
+              })
+            }
             disabled={isDeleting}
           />
         </Modal.Content>
