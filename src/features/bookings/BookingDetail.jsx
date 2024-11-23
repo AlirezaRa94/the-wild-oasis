@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 import BookingDataBox from "./BookingDataBox";
 import Row from "../../ui/Row";
@@ -22,6 +23,7 @@ const HeadingGroup = styled.div`
 function BookingDetail() {
   const { booking, isPending, error } = useGetBooking();
   const moveBack = useMoveBack();
+  const navigate = useNavigate();
 
   if (isPending) return <Spinner />;
 
@@ -47,6 +49,14 @@ function BookingDetail() {
       <BookingDataBox booking={booking} />
 
       <ButtonGroup>
+        {status === "unconfirmed" && (
+          <Button
+            $variation='primary'
+            onClick={() => navigate(`/checkin/${bookingId}`)}
+          >
+            Check in
+          </Button>
+        )}
         <Button $variation='secondary' onClick={moveBack}>
           Back
         </Button>
