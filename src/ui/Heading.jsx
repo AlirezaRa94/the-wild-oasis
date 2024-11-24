@@ -9,6 +9,14 @@ const Heading = styled.h1`
     `}
 
   ${(props) =>
+    props.as === "h1-center" &&
+    css`
+      font-size: 3rem;
+      font-weight: 600;
+      text-align: center;
+    `}
+
+  ${(props) =>
     props.as === "h2" &&
     css`
       font-size: 2rem;
@@ -23,6 +31,7 @@ const Heading = styled.h1`
     `}
 
   line-height: 1.2;
+  text-transform: capitalize;
 `;
 
 export default Heading;
