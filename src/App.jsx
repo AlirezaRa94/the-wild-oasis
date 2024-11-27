@@ -17,6 +17,8 @@ import Booking from "./pages/Booking";
 import CheckIn from "./pages/CheckIn";
 import ProtectedRoute from "./ui/ProtectedRoute";
 
+import { DarkModeProvider } from "./contexts/DarkModeContext";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -27,55 +29,57 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <GlobalStyles />
-      <BrowserRouter>
-        <Routes>
-          <Route
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate replace to='dashboard' />} />
-            <Route path='dashboard' element={<Dashboard />} />
-            <Route path='bookings' element={<Bookings />} />
-            <Route path='bookings/:bookingId' element={<Booking />} />
-            <Route path='checkin/:bookingId' element={<CheckIn />} />
-            <Route path='cabins' element={<Cabins />} />
-            <Route path='users' element={<Users />} />
-            <Route path='settings' element={<Settings />} />
-            <Route path='account' element={<Account />} />
-          </Route>
-          <Route path='*' element={<PageNotFound />} />
-          <Route path='login' element={<Login />} />
-        </Routes>
-      </BrowserRouter>
-      <Toaster
-        position='top-center'
-        gutter={12}
-        containerStyle={{
-          margin: 8,
-        }}
-        toastOptions={{
-          success: {
-            duration: 3000,
-          },
-          error: {
-            duration: 5000,
-          },
-          style: {
-            fontSize: "16px",
-            maxWidth: "500px",
-            padding: "16px 24px",
-            backgroundColor: "var(--color-grey-0)",
-            color: "var(--color-grey-700)",
-          },
-        }}
-      />
-    </QueryClientProvider>
+    <DarkModeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <GlobalStyles />
+        <BrowserRouter>
+          <Routes>
+            <Route
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate replace to='dashboard' />} />
+              <Route path='dashboard' element={<Dashboard />} />
+              <Route path='bookings' element={<Bookings />} />
+              <Route path='bookings/:bookingId' element={<Booking />} />
+              <Route path='checkin/:bookingId' element={<CheckIn />} />
+              <Route path='cabins' element={<Cabins />} />
+              <Route path='users' element={<Users />} />
+              <Route path='settings' element={<Settings />} />
+              <Route path='account' element={<Account />} />
+            </Route>
+            <Route path='*' element={<PageNotFound />} />
+            <Route path='login' element={<Login />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster
+          position='top-center'
+          gutter={12}
+          containerStyle={{
+            margin: 8,
+          }}
+          toastOptions={{
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            },
+            style: {
+              fontSize: "16px",
+              maxWidth: "500px",
+              padding: "16px 24px",
+              backgroundColor: "var(--color-grey-0)",
+              color: "var(--color-grey-700)",
+            },
+          }}
+        />
+      </QueryClientProvider>
+    </DarkModeProvider>
   );
 }
 
